@@ -1,4 +1,9 @@
-include("structs/Livestream.jl")
+module JavisGtkViewerExt
+
+using Javis
+using Javis: Video, CairoImageSurface, image, get_javis_frame
+using Gtk
+using GtkReactive
 
 """
     _draw_image(video::Video, objects::Vector, frame::Int, canvas::Gtk.Canvas,
@@ -26,12 +31,12 @@ function _draw_image(
 end
 
 """
-    _increment(video::Video, widgets::Vector, objects::Vector, dims::Vector,
+    Javis._increment(video::Video, widgets::Vector, objects::Vector, dims::Vector,
         canvas::Gtk.Canvas, frames::Int, layers=Vector)
 
 Increments a given value and returns the associated frame.
 """
-function _increment(
+function Javis._increment(
     video::Video,
     widgets::Vector,
     objects::Vector,
@@ -53,12 +58,12 @@ function _increment(
 end
 
 """
-    _decrement(video::Video, widgets::Vector, objects::Vector, dims::Vector,
+    Javis._decrement(video::Video, widgets::Vector, objects::Vector, dims::Vector,
         canvas::Gtk.Canvas, frames::Int, layers::Vector)
 
 Decrements a given value and returns the associated frame.
 """
-function _decrement(
+function Javis._decrement(
     video::Video,
     widgets::Vector,
     objects::Vector,
@@ -80,11 +85,11 @@ function _decrement(
 end
 
 """
-     _javis_viewer(video::Video, frames::Int, object_list::Vector, show::Bool)
+    Javis._javis_viewer(video::Video, frames::Int, object_list::Vector, show::Bool)
 
 Internal Javis Viewer built on Gtk that is called for live previewing.
 """
-function _javis_viewer(
+function Javis._javis_viewer(
     video::Video,
     total_frames::Int,
     object_list::Vector,
@@ -202,28 +207,42 @@ function _javis_viewer(
     # When the `forward` button is clicked, increment current frame number
     # If at final frame, wrap viewer to first frame
     signal_connect(forward, "clicked") do widget
-        _increment(video, [slide, tbox], object_list, frame_dims, canvas, total_frames)
+        Javis._increment(video, [slide, tbox], object_list, frame_dims, canvas, total_frames)
     end
 
     # When the `Right Arrow` key is pressed, increment current frame number
     # If at final frame, wrap viewer to first frame
     signal_connect(win, "key-press-event") do widget, event
         if event.keyval == 65363
-            _increment(video, [slide, tbox], object_list, frame_dims, canvas, total_frames)
+            Javis._increment(
+                video,
+                [slide, tbox],
+                object_list,
+                frame_dims,
+                canvas,
+                total_frames,
+            )
         end
     end
 
     # When the `backward` button is clicked, decrement the current frame number
     # If at first frame, wrap viewer to last frame
     signal_connect(backward, "clicked") do widget
-        _decrement(video, [slide, tbox], object_list, frame_dims, canvas, total_frames)
+        Javis._decrement(video, [slide, tbox], object_list, frame_dims, canvas, total_frames)
     end
 
     # When the `Left Arrow` key is pressed, decrement current frame number
     # If at first frame, wrap viewer to last frame
     signal_connect(win, "key-press-event") do widget, event
         if event.keyval == 65361
-            _decrement(video, [slide, tbox], object_list, frame_dims, canvas, total_frames)
+            Javis._decrement(
+                video,
+                [slide, tbox],
+                object_list,
+                frame_dims,
+                canvas,
+                total_frames,
+            )
         end
     end
 
@@ -237,123 +256,4 @@ function _javis_viewer(
     end
 end
 
-"""
-    setup_stream(livestreamto=:local; protocol="udp", address="0.0.0.0", port=14015, twitch_key="")
-
-Sets up the livestream configuration.
-**NOTE:** Twitch not fully implemented, do not use.
-"""
-function setup_stream(
-    livestreamto::Symbol = :local;
-    protocol::String = "udp",
-    address::String = "0.0.0.0",
-    port::Int = 14015,
-    twitch_key::String = "",
-)
-    StreamConfig(livestreamto, protocol, address, port, twitch_key)
-end
-
-"""
-    cancel_stream()
-
-Sends a `SIGKILL` signal to the livestreaming process. Though used internally, it can be used stop streaming.
-However this method is not guaranted to end the stream on the client side.
-"""
-function cancel_stream()
-    #todo explore better ways of searching and killing processes
-
-    # kill the ffmpeg process
-    # ps aux | grep ffmpeg | grep stream_loop | awk '{print $2}' | xargs kill -9
-    try
-        println("Checking for existing stream....")
-        run(
-            pipeline(
-                `ps aux`,
-                pipeline(`grep ffmpeg`, pipeline(`grep stream_loop`, `awk '{print $2}'`)),
-            ),
-        )
-    catch
-        return @warn "Not Streaming Anything Currently"
-    end
-
-    run(
-        pipeline(
-            `ps aux`,
-            pipeline(
-                `grep ffmpeg`,
-                pipeline(`grep stream_loop`, pipeline(`awk '{print $2}'`, `xargs kill -9`)),
-            ),
-        ),
-    )
-    return "Livestream Cancelled!"
-end
-
-"""
-    _livestream(streamconfig, framerate, width, height, pathname)
-
-Internal method for livestreaming 
-"""
-function _livestream(
-    streamconfig::StreamConfig,
-    framerate::Int,
-    width::Int,
-    height::Int,
-    pathname::String,
-)
-    cancel_stream()
-
-    livestreamto = streamconfig.livestreamto
-    twitch_key = streamconfig.twitch_key
-
-    if livestreamto == :twitch && isempty(twitch_key)
-        return error("Please enter your twitch stream key")
-    end
-
-    command = [
-        "-stream_loop", # loop the stream -1 times i.e. indefinitely
-        "-1",
-        "-r", # frames per second
-        "$framerate",
-        "-an",  # Tells FFMPEG not to expect any audio
-        "-loglevel", # show only ffmpeg errors
-        "error",
-        "-re", # read input at native frame rate
-        "-i", # input file
-        "$pathname",
-    ]
-
-    if livestreamto == :twitch
-        if isempty(twitch_key)
-            error("Please enter your twitch api key")
-        end
-
-        # 
-        twitch_cmd = [
-            "-f",
-            "flv", # force the file to flv format
-            "rtmp://live.twitch.tv/app/$twitch_key", # stream to the twitch platform using rtmp protocol
-        ]
-        push!(command, twitch_cmd...)
-        @info "Livestreaming to Twitch!"
-    elseif livestreamto == :local
-        protocol = streamconfig.protocol
-        address = streamconfig.address
-        port = streamconfig.port
-        local_command = ["-f", "mpegts", "$protocol://$address:$port"] # use an mpeg-ts format, and stream to the given address/port using the protocol
-        push!(command, local_command...)
-        @info "Livestream Started at $protocol://$address:$port"
-    end
-
-    # schedule the streaming process and allow it to run asynchronously
-    schedule(@task begin
-        ffmpeg_exe(`$command`)
-    end)
-end
-
-_livestream(
-    streamconfig::Nothing,
-    framerate::Int,
-    width::Int,
-    height::Int,
-    pathname::String,
-) = return
+end # module

@@ -8,19 +8,23 @@ Animations = "27a7e980-b3e6-11e9-2bcd-0b925532e340"
 Cairo = "159f3aea-2a34-519c-b102-8c37f9878175"
 FFMPEG = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-Gtk = "4c0ca9eb-093a-5379-98c5-f87ac0bbbf44"
-GtkReactive = "27996c0f-39cd-5cc1-a27a-05f136f946b6"
 Hungarian = "e91730f6-4275-51fb-a7a0-7064cfbd3b39"
 ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
-Interact = "c601a237-2ae4-5e1e-952c-7a85b0c7eef1"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LightXML = "9c8b4983-aa76-5018-a973-4c85ecc9e179"
 Luxor = "ae8d54c2-7ccd-5906-9d76-62fc9837b5bc"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+
+[weakdeps]
+Gtk = "4c0ca9eb-093a-5379-98c5-f87ac0bbbf44"
+GtkReactive = "27996c0f-39cd-5cc1-a27a-05f136f946b6"
+
+[extensions]
+JavisGtkViewerExt = ["Gtk", "GtkReactive"]
 
 [compat]
 Animations = "0.4"
@@ -33,9 +37,8 @@ Hungarian = "0.6"
 ImageIO = "0.4, 0.5, 0.6"
 ImageMagick = "1.1"
 Images = "0.20, 0.21, 0.22, 0.23, 0.24, 0.25"
-Interact = "0.10"
 LaTeXStrings = "1.1"
 LightXML = "0.9"
 Luxor = "3.5"
 ProgressMeter = "1"
-julia = "1.6"
+julia = "1.9"

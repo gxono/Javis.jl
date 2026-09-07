@@ -67,6 +67,12 @@ These can be installed via `] add Animations` and `] add Colors` inside the REPL
 - **Animations.jl** defines easing functions such that we can have non-linear movement
 - **Colors.jl** defines colors and gives access to different color spaces such that we can transition from a color to another by using Animations.jl.
 
+`liveview=true` opens a Gtk-based preview window, which is provided as a package extension so a
+plain `using Javis` doesn't have to pull in Gtk. Load `Gtk` and `GtkReactive` alongside it to
+enable the preview (see the "How Can I See a Live Preview" section of the [How To?](@ref) guide
+if adding `GtkReactive` fails to resolve in your environment; if so, drop `liveview=true` below
+and just render to `loading.gif` as in the previous example):
+
 ```julia
 using Javis, Animations, Colors
 

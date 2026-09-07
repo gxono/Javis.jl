@@ -1,3 +1,7 @@
+# NOT included by runtests.jl currently: GtkReactive caps IntervalSets at 0.3-0.5,
+# which cannot resolve alongside a modern Images.jl in the same environment. This
+# file is kept as a spec for JavisGtkViewerExt; run it manually (with `using Gtk,
+# GtkReactive, Reactive` and a matching Images downgrade) if you touch that extension.
 function ground(args...)
     background("white")
     sethue("black")
@@ -53,56 +57,4 @@ end
     @test curr_frame == 1
 
     @test last_frame != first_frame
-end
-
-
-@testset "Livestreaming" begin
-    astar() = star(O, 50, 5, 0.5, 0, :fill)
-    acirc() = circle(Point(100, 100), 50, :fill)
-
-    vid = Video(500, 500)
-    back = Background(1:100, ground)
-    star_obj = Object(1:100, (args...) -> astar())
-    act!(star_obj, Action(morph_to(acirc)))
-
-    conf_local = setup_stream(:local, address = "0.0.0.0", port = 8081)
-    @test conf_local isa Javis.StreamConfig
-    @test conf_local.livestreamto == :local
-    @test conf_local.protocol == "udp"
-    @test conf_local.address == "0.0.0.0"
-    @test conf_local.port == 8081
-
-    conf_twitch_err = setup_stream(:twitch)
-    conf_twitch = setup_stream(:twitch, twitch_key = "foo")
-    @test conf_twitch_err isa Javis.StreamConfig
-    @test conf_twitch_err.livestreamto == :twitch
-    @test isempty(conf_twitch_err.twitch_key)
-    @test conf_twitch.twitch_key == "foo"
-
-    render(vid, pathname = "stream_local.gif", streamconfig = conf_local)
-
-    # errors with macos; a good test to have
-    # test_local = run(pipeline(`lsof -i -P -n`, `grep ffmpeg`))
-    # @test test_local isa Base.ProcessChain
-    # @test test_local.processes isa Vector{Base.Process}
-
-    cancel_stream()
-    @test_throws ProcessFailedException run(
-        pipeline(
-            `ps aux`,
-            pipeline(`grep ffmpeg`, pipeline(`grep stream_loop`, `awk '{print $2}'`)),
-        ),
-    )
-
-    vid = Video(500, 500)
-    back = Background(1:100, ground)
-    star_obj = Object(1:100, (args...) -> astar())
-    act!(star_obj, Action(morph_to(acirc)))
-
-    @test_throws ErrorException render(
-        vid,
-        pathname = "stream_twitch.gif",
-        streamconfig = conf_twitch_err,
-    )
-    rm("stream_twitch.gif")
 end

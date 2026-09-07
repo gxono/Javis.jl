@@ -1,9 +1,5 @@
 using Animations
-using GtkReactive
-using Gtk: get_gtk_property, visible
 using Images
-import Interact
-import Interact: @map, Widget, Widgets, @layout!, hbox, vbox
 using Javis
 import Latexify: latexify
 using LaTeXStrings
@@ -59,9 +55,12 @@ end
     @testset "Postprocessing" begin
         include("postprocessing.jl")
     end
-    # keep this the last test to avoid glitch where prompt
-    # gets stuck during test.
-    @testset "Javis Viewer" begin
-        include("viewer.jl")
+    @testset "Livestreaming" begin
+        include("livestream.jl")
     end
+    # The Gtk-based live viewer (test/viewer.jl, JavisGtkViewerExt) is not tested
+    # here: GtkReactive is capped at IntervalSets 0.3-0.5 upstream and cannot
+    # resolve in the same environment as a modern Images.jl. See CHANGELOG.md
+    # and test/Project.toml. Re-enable once that's resolved upstream, or once
+    # the extension is rewritten without a GtkReactive dependency.
 end

@@ -4,12 +4,8 @@ using Animations
 import Animations: linear_interpolate
 import Cairo: CairoImageSurface, image
 using FFMPEG
-using Gtk
-using GtkReactive
 using Hungarian
 using Images
-import Interact
-import Interact: @map, Widget, Widgets, @layout!, hbox, vbox # not exporting textbox & slider due to possible conflicts with Gtk & luxor
 using LaTeXStrings
 using LightXML
 import Luxor
@@ -108,7 +104,7 @@ include("backgrounds.jl")
 include("svg2luxor.jl")
 include("morphs.jl")
 include("action_animations.jl")
-include("javis_viewer.jl")
+include("livestream.jl")
 include("latex.jl")
 include("object_values.jl")
 include("partial_draw.jl")

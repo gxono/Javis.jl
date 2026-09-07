@@ -208,6 +208,18 @@ The live viewer can be called with adding `; liveview=true` to the [`render`](@r
 
 > **NOTE:** If `liveview=true` the `tempdirectory` and `pathname` arguments are ignored and no file is created.
 
+> **NOTE:** Outside of Jupyter/Pluto, the live viewer window is built on Gtk and is provided as a
+> package extension. Run `using Gtk, GtkReactive` before calling `render(...; liveview=true)`,
+> otherwise Javis will raise an informative error. `Gtk`/`GtkReactive` are optional dependencies,
+> so a plain `using Javis` no longer pulls them in.
+>
+> **KNOWN LIMITATION:** as of this writing, `GtkReactive` caps its `IntervalSets` compat at
+> `0.3-0.5` (unfixed even on its unreleased `master`), which cannot resolve alongside a modern
+> `Images.jl` (which needs `IntervalSets >= 0.7`). In practice this means `add`ing `GtkReactive`
+> into an environment that also has Javis (and therefore `Images`) currently fails to resolve.
+> This is an upstream GtkReactive problem, not a Javis one — rendering to a file
+> (`liveview=false`, the default) is unaffected.
+
 ## How Can I Speed Up Rendering?
 
 For longer videos, it can happen that rendering takes some time.

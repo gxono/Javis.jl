@@ -1,6 +1,18 @@
 # Javis.jl - Changelog
 
 # PR changes
+- Moved the Gtk-based live viewer (`liveview=true` outside Jupyter/Pluto) into a package
+  extension (`JavisGtkViewerExt`). `Gtk` and `GtkReactive` are now weak/optional
+  dependencies: `using Javis` no longer requires them, only `using Gtk, GtkReactive` before
+  calling `render(...; liveview=true)`. Fixes install/precompile issues on headless setups.
+  **Known limitation:** `GtkReactive` caps `IntervalSets` at `0.3-0.5` upstream (unfixed even
+  on its unreleased master) and currently cannot resolve alongside a modern `Images.jl`
+  (which needs `IntervalSets >= 0.7`), so adding `GtkReactive` into a Javis environment fails
+  today regardless of this change. The `test/viewer.jl` Gtk testset is therefore excluded
+  from `Pkg.test()` for now; it's kept as a spec for the extension. Everything else
+  (rendering, animations, morphs, latex, layers, livestreaming) is unaffected.
+- Removed the unused `Interact` dependency (dead code, no longer referenced anywhere).
+- Raised minimum Julia version to 1.9 (required for package extensions).
 - changed render method for mp4 to use ffmpeg directly inplace of VideoIO
 - Added jpaths a field in Object that is useful for morphs and partial drawing
 - Added morphs to arbitrary objects and functions.
