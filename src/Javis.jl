@@ -715,6 +715,12 @@ const LUXOR_DONT_EXPORT = [
     :scale,
     :text,
     :background,
+    :Luxor, # every module has a self-binding to its own name; without this,
+    # `using Javis` leaks the whole Luxor module into the caller's scope (#489)
+    :latexboundingbox, :latextextsize, :rawlatexboundingbox, # exported by Luxor's
+    # `export` list but no longer bound to anything as of Luxor 3.8: importing them
+    # only produces an "undeclared at import time" warning for a name that would
+    # UndefVarError if called anyway.
 ]
 
 # Export each function from Luxor

@@ -66,13 +66,17 @@ macro scale_layer(scale_mapping, body)
                 sy =
                     ($scale_mapping.tmax.y - $scale_mapping.tmin.y) /
                     ($scale_mapping.fmax.y - $scale_mapping.fmin.y)
-                Luxor.scale(sx, sy)
+                # $(Luxor) interpolates the actual module (captured here, where
+                # Javis has it imported) as a literal value into the escaped
+                # quote, instead of leaving a bare `Luxor` name that would
+                # otherwise need to resolve in the macro *caller's* scope (#489)
+                $(Luxor).scale(sx, sy)
 
                 # translate such that inputting the center from the "from mapping" is at 0,0
-                Luxor.translate(-fcenterx, -fcentery)
+                $(Luxor).translate(-fcenterx, -fcentery)
 
                 # shift center of canvas to center of new region
-                Luxor.translate(tcenterx / sx, tcentery / sy)
+                $(Luxor).translate(tcenterx / sx, tcentery / sy)
                 $body
             end
         end,
