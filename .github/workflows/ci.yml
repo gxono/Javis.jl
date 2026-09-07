@@ -18,14 +18,14 @@ jobs:
         arch:
           - x64
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: sudo apt-get install xvfb && Xvfb :99 &
         if: matrix.os == 'ubuntu-latest'
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         env:
           cache-name: cache-artifacts
         with:
@@ -40,14 +40,20 @@ jobs:
         env:
           DISPLAY: :99
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v4
         with:
           file: lcov.info
   docs:
     name: Documentation
     runs-on: ubuntu-latest
+    # Needed to let deploydocs() push to gh-pages with the default GITHUB_TOKEN:
+    # this repo is a GitHub fork, and forks never receive custom repository
+    # secrets (DOCUMENTER_KEY included) regardless of who triggers the workflow,
+    # so the SSH-deploy-key path silently falls back to GITHUB_TOKEN here.
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: sudo apt-get install xvfb && Xvfb :99 &
       - uses: julia-actions/setup-julia@v1
         with:

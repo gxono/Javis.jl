@@ -4,6 +4,7 @@
 /docs/build/
 Manifest.toml
 .vscode/
+.claude/
 test.png
 test/current/
 .commit

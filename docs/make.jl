@@ -36,8 +36,4 @@ makedocs(;
     ],
 )
 
-deploydocs(;
-    repo = "github.com/gxono/Javis.jl",
-    push_preview = true,
-    devbranch = "main",
-)
+deploydocs(; repo = "github.com/gxono/Javis.jl", push_preview = true, devbranch = "main")
