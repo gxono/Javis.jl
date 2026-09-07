@@ -1,11 +1,29 @@
 using Animations
+using FFMPEG
 using Images
 using Javis
 import Latexify: latexify
 using LaTeXStrings
 using ReferenceTests
 using Test
-using VideoIO
+
+"""
+    video_duration(path)
+
+Duration in seconds of the video at `path`, read via `ffprobe`. Used instead of
+VideoIO.get_duration: VideoIO's own PrecompileTools workload segfaults while
+encoding its precompile-time test video on some CI runners (Ubuntu/macOS,
+Julia 1.9 observed), and Javis doesn't use VideoIO for anything else - its own
+render() pipes frames to ffmpeg directly.
+"""
+function video_duration(path)
+    out = FFMPEG.exe(
+        `-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 $path`;
+        command = FFMPEG.ffprobe,
+        collect = true,
+    )
+    return parse(Float64, strip(out[1]))
+end
 
 function ground(video, action, framenumber)
     background("white")
