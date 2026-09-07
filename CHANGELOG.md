@@ -1,6 +1,14 @@
 # Javis.jl - Changelog
 
 # PR changes
+- **Breaking:** migrated to Luxor 4.x, dropping Luxor 3.x support (`Luxor = "4"`).
+  - `sethue()` (the zero-argument Action-animator helper, e.g.
+    `Action(1:150, color_anim, sethue())`) is renamed to **`sethue_anim()`**. Luxor 4.0
+    added its own zero-argument `sethue()` (a getter for the current color) which collides
+    with the old name/meaning. Update any animation using `sethue()` this way to
+    `sethue_anim()`.
+  - Luxor 4.0 also removed `Point +/- Number` scalar arithmetic (e.g. `O - 50`). Javis's own
+    `src/` never relied on this, but update your own scripts if they do.
 - Moved the Gtk-based live viewer (`liveview=true` outside Jupyter/Pluto) into a package
   extension (`JavisGtkViewerExt`). `Gtk` and `GtkReactive` are now weak/optional
   dependencies: `using Javis` no longer requires them, only `using Gtk, GtkReactive` before
