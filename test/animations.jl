@@ -188,7 +188,7 @@ end
     new_size = trunc.(Int, size(ref_image) .* 0.5)
     ref_image = imresize(ref_image, new_size)
 
-    @test load("images/0000000016.png") == ref_image
+    @test psnr_equality()(ref_image, load("images/0000000016.png"))
     for i in 1:25
         rm("images/$(lpad(i, 10, "0")).png")
     end
