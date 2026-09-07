@@ -317,7 +317,7 @@ function render(
         ffmpegproc = @ffmpeg_env open(`ffmpeg $options $pathname`; write = true)
         io = IOBuffer()
     end
-    @showprogress 1 "Rendering frames..." for frame in frames
+    @showprogress dt = 1 desc = "Rendering frames..." for frame in frames
         frame_image = _postprocess(
             video,
             objects,
@@ -338,9 +338,12 @@ function render(
             if !isa(frame_image, Matrix{RGB{N0f8}})
                 frame_image = convert.(RGB{N0f8}, frame_image)
             end
-            take!(io) #clear the buffer
             Images.save(Stream{format"PNG"}(io), frame_image)
-            write(ffmpegproc, io.data)
+            # io.data is the IOBuffer's over-allocated backing array (often longer
+            # than what was actually written); take! returns exactly the bytes
+            # written for this frame, so ffmpeg's stdin doesn't get trailing
+            # garbage appended after each frame.
+            write(ffmpegproc, take!(io))
         end
         filecounter += 1
     end
