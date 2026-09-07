@@ -207,7 +207,14 @@ function Javis._javis_viewer(
     # When the `forward` button is clicked, increment current frame number
     # If at final frame, wrap viewer to first frame
     signal_connect(forward, "clicked") do widget
-        Javis._increment(video, [slide, tbox], object_list, frame_dims, canvas, total_frames)
+        Javis._increment(
+            video,
+            [slide, tbox],
+            object_list,
+            frame_dims,
+            canvas,
+            total_frames,
+        )
     end
 
     # When the `Right Arrow` key is pressed, increment current frame number
@@ -228,7 +235,14 @@ function Javis._javis_viewer(
     # When the `backward` button is clicked, decrement the current frame number
     # If at first frame, wrap viewer to last frame
     signal_connect(backward, "clicked") do widget
-        Javis._decrement(video, [slide, tbox], object_list, frame_dims, canvas, total_frames)
+        Javis._decrement(
+            video,
+            [slide, tbox],
+            object_list,
+            frame_dims,
+            canvas,
+            total_frames,
+        )
     end
 
     # When the `Left Arrow` key is pressed, decrement current frame number
