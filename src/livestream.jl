@@ -39,15 +39,26 @@ function cancel_stream()
         return @warn "Not Streaming Anything Currently"
     end
 
-    run(
-        pipeline(
-            `ps aux`,
+    # The process found above can already be gone by the time we get here (it's
+    # a separate `ps`/`grep` snapshot), in which case this pipeline's `grep`
+    # finds nothing, exits 1, and `run` throws - same benign "nothing to kill"
+    # case as above, not a real failure.
+    try
+        run(
             pipeline(
-                `grep ffmpeg`,
-                pipeline(`grep stream_loop`, pipeline(`awk '{print $2}'`, `xargs kill -9`)),
+                `ps aux`,
+                pipeline(
+                    `grep ffmpeg`,
+                    pipeline(
+                        `grep stream_loop`,
+                        pipeline(`awk '{print $2}'`, `xargs kill -9`),
+                    ),
+                ),
             ),
-        ),
-    )
+        )
+    catch
+        return @warn "Not Streaming Anything Currently"
+    end
     return "Livestream Cancelled!"
 end
 
