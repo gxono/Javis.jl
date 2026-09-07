@@ -4,13 +4,13 @@ using Documenter
 makedocs(;
     modules = [Javis],
     authors = "Ole Kröger <o.kroeger@opensourc.es> and contributors",
-    repo = "https://github.com/JuliaAnimators/Javis.jl/blob/{commit}{path}#L{line}",
+    repo = Documenter.Remotes.GitHub("gxono", "Javis.jl"),
     sitename = "Javis.jl",
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", "false") == "true",
-        canonical = "https://JuliaAnimators.github.io/Javis.jl",
+        canonical = "https://gxono.github.io/Javis.jl",
         assets = String[],
-        edit_branch = "main",
+        edit_link = "main",
     ),
     pages = [
         "Home" => "index.md",
@@ -37,7 +37,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/JuliaAnimators/Javis.jl",
+    repo = "github.com/gxono/Javis.jl",
     push_preview = true,
     devbranch = "main",
 )

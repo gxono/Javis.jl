@@ -97,16 +97,14 @@ Finally after that, go to the "Network" tab and, per the Javis default, put `udp
 
 ### Twitch Support - Coming Soon!
 
-````@meta
+<!--
 ### Streaming to Twitch
 
-
-Javis allows streaming animations directly to the [Twitch](twitch.tv) platform.
+Javis allows streaming animations directly to the [Twitch](https://twitch.tv) platform.
 All you need to do is pass the symbol `:twitch` and your [twitch stream key](https://www.businessinsider.in/tech/how-to/how-to-find-your-twitch-stream-key-which-will-let-you-start-streaming-games-and-access-other-features/articleshow/76450099.cms) as arguments to the `stream_setup` method.
 ```julia
-...
 stream_conf = setup_stream(:twitch, twitch_key = "<twitch stream key>")
 render(vid, streamconfig=stream_conf)
 ```
-````
+-->
 
