@@ -244,7 +244,7 @@ for frame_start in 1:10:50
     act!(blob, Action(1:30, translate_anim, translate()))
     act!(blob, Action(31:120, rotate_anim, rotate_around(Point(-150, 0))))
     act!(blob, Action(121:150, translate_back_anim, translate()))
-    act!(blob, Action(1:150, color_anim, sethue())) # new line
+    act!(blob, Action(1:150, color_anim, sethue_anim())) # new line
 end
 ```
 
@@ -261,7 +261,7 @@ for frame_start in 1:10:50
     act!(blob, Action(1:30, translate_anim, translate()))
     act!(blob, Action(31:120, rotate_anim, rotate_around(Point(-150, 0))))
     act!(blob, Action(121:150, translate_back_anim, translate()))
-    act!(blob, Action(1:150, color_anim, sethue()))
+    act!(blob, Action(1:150, color_anim, sethue_anim()))
 end
 ```
 
@@ -333,7 +333,7 @@ for frame_start in 1:10:50
     act!(blob, Action(1:30, translate_anim, translate()))
     act!(blob, Action(31:120, rotate_anim, rotate_around(Point(-150, 0))))
     act!(blob, Action(121:150, translate_back_anim, translate()))
-    act!(blob, Action(1:150, color_anim, sethue()))
+    act!(blob, Action(1:150, color_anim, sethue_anim()))
 end
 
 render(

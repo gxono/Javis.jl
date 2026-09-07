@@ -13,7 +13,7 @@ end
 
 function boxfunc(color)
     sethue(color)
-    box(O - 50, 50, 50, :stroke)
+    box(Point(-50, -50), 50, 50, :stroke)
 end
 
 @testset "Morphing star to circle and back , morph to function" begin

@@ -1,5 +1,5 @@
 function draw_complex_shape()
-    circle(O + 20, 100, :stroke)
+    circle(Point(20, 20), 100, :stroke)
     sethue("red")
     box(O, 100, 120, :fillpreserve)
     sethue("black")

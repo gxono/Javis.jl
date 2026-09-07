@@ -314,10 +314,16 @@ function _scale(video, layer::Layer, action, rel_frame)
 end
 
 """
-    sethue()
+    sethue_anim()
 
 Set the color of an [`Object`](@ref) using an [`Action`](@ref) and an Animation defined
 with Animations.jl.
+
+!!! note
+    Named `sethue_anim` rather than `sethue` because Luxor 4 added its own zero-argument
+    `sethue()` (a getter for the current color), which collides with this function's
+    old name and old, distinct meaning (returning an Action animator). Was `sethue()`
+    before Luxor 4 support.
 
 # Example
 A possible animation would look like this:
@@ -334,9 +340,9 @@ color_anim = Animation(
 ```
 
 An example on how to integrate this into an [`Action`](@ref) can be seen in [`rotate`](@ref).
-Where this would be a valid Action: `Action(1:150, color_anim, sethue())`.
+Where this would be a valid Action: `Action(1:150, color_anim, sethue_anim())`.
 """
-function Luxor.sethue()
+function sethue_anim()
     (video, object, action, rel_frame) -> _sethue(video, object, action, rel_frame)
 end
 

@@ -443,7 +443,7 @@ end
     act!(circle_obj, Action(51:100, rotate_anim, rotate_around(Point(-150, 0))))
     act!(circle_obj, Action(101:140, translate_back_anim, translate()))
     act!(circle_obj, Action(141:150, rev(sineio()), scale()))
-    act!(circle_obj, Action(1:150, color_anim, sethue()))
+    act!(circle_obj, Action(1:150, color_anim, sethue_anim()))
 
     bot_circle = Object((args...) -> circle(O, 25, :fill), Point(0, 200))
     act!(bot_circle, Action(sineio(), setopacity()))
@@ -583,7 +583,7 @@ end
 
     actions = [
         Action(1:150, anim, follow_path(star(O, 100))),
-        Action(1:150, color_anim, sethue()),
+        Action(1:150, color_anim, sethue_anim()),
     ]
 
     objects = [
@@ -632,7 +632,7 @@ end
                     closed = false,
                 ),
             ),
-            Action(1:150, color_anim, sethue()),
+            Action(1:150, color_anim, sethue_anim()),
         ]
 
     objects = [
