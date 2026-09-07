@@ -1,13 +1,15 @@
 # Javis
 
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliaanimators.github.io/Javis.jl/stable/)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliaanimators.github.io/Javis.jl/dev/)
-[![Build Status](https://github.com/JuliaAnimators/Javis.jl/workflows/CI/badge.svg)](https://github.com/JuliaAnimators/Javis.jl/actions)
-[![Coverage](https://codecov.io/gh/JuliaAnimators/Javis.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaAnimators/Javis.jl)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://gxono.github.io/Javis.jl/stable/)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://gxono.github.io/Javis.jl/dev/)
+[![Build Status](https://github.com/gxono/Javis.jl/workflows/CI/badge.svg)](https://github.com/gxono/Javis.jl/actions)
 [![project chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://julialang.zulipchat.com/#narrow/stream/253420-javis)
 
-<!--![GitHub Hacktoberfest combined status](https://img.shields.io/github/hacktoberfest/2020/Wikunia/Javis.jl)-->
+> **This is a maintained fork.** The original [JuliaAnimators/Javis.jl](https://github.com/JuliaAnimators/Javis.jl)
+> has had no code changes since August 2022 and does not install cleanly on current Julia versions.
+> This fork keeps the same API while fixing installation, rendering, and dependency-resolution bugs
+> that accumulated while the original went unmaintained — see [CHANGELOG.md](CHANGELOG.md) for specifics.
 
 **Javis:** **J**ulia **A**nimations and **Vis**ualizations
 
@@ -56,10 +58,11 @@ Furthermore, details on our philosophy can be found here: [Design Mission and Ph
 
 ## Installation
 
-To install `Javis` into your Julia installation, type into your Julia REPL the following:
+This fork is not (yet) registered in the Julia General registry, so `] add Javis` would install the
+original, unmaintained package instead. Install this fork directly from GitHub:
 
 ```
-julia> ] add Javis
+julia> ] add https://github.com/gxono/Javis.jl
 ```
 
 That's all there is to it! 😃
