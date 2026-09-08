@@ -11,6 +11,11 @@ makedocs(;
         canonical = "https://gxono.github.io/Javis.jl",
         assets = String[],
         edit_link = "main",
+        # references.md re-exports (and documents) Luxor's entire public API on top of
+        # Javis's own, so it's inherently large - it was already within ~1KiB of
+        # Documenter's default 200KiB hard limit before this option was added, meaning
+        # any future docstring addition could turn a warning into a build failure.
+        size_threshold_ignore = ["references.md"],
     ),
     pages = [
         "Home" => "index.md",

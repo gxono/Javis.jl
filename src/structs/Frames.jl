@@ -150,7 +150,23 @@ function prev_end()
     end
 end
 
+"""
+    startof(oa::Union{Action,Object})
+
+The (already computed) first frame of `oa`. Can be used together with [`@Frames`](@ref) to
+define a frame range relative to a specific object or action rather than the immediately
+preceding one (which [`prev_start`](@ref) refers to):
+```julia
+@Frames(startof(some_earlier_object) + 5, 10)
+```
+"""
 startof(oa::Union{AbstractAction,AbstractObject}) = oa.frames.frames[1]
+
+"""
+    endof(oa::Union{Action,Object})
+
+The (already computed) last frame of `oa`. See [`startof`](@ref).
+"""
 endof(oa::Union{AbstractAction,AbstractObject}) = oa.frames.frames[end]
 
 """

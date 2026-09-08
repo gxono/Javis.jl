@@ -48,6 +48,23 @@ function (ls::LinearScale{T})(p::Point) where {T<:Point}
     return Point(nx, ny)
 end
 
+"""
+    @scale_layer scale_mapping body
+
+Run `body` (a `begin ... end` block of drawing calls) inside a Luxor layer whose coordinate
+system is remapped through `scale_mapping` (a [`scale_linear`](@ref) mapping), so drawing
+calls inside `body` can use "logical"/data coordinates instead of canvas pixels.
+
+# Example
+```julia
+mapping = scale_linear(O, Point(5, 5), Point(50, -50), Point(200, -200))
+@scale_layer mapping begin
+    # `pts` are in the mapping's "from" coordinate space (O to Point(5,5)),
+    # drawn as if they were in its "to" space (Point(50,-50) to Point(200,-200))
+    circle.(pts, 0.1, :fill)
+end
+```
+"""
 macro scale_layer(scale_mapping, body)
     return esc(
         quote
