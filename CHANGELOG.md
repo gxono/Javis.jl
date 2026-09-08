@@ -1,6 +1,46 @@
 # Javis.jl - Changelog
 
 # PR changes
+- Added `global_end()` and taught `@Frames` to round non-integer results, so frame ranges
+  can be defined as a percentage of the whole video: `@Frames(0.25 * global_end(), stop =
+  0.75 * global_end())` covers the middle half regardless of the video's total frame count
+  (closes #239).
+- Clarified that `rotate_around`/`anim_rotate_around`'s point is an absolute/canvas
+  coordinate, not relative to the rotating object's own position (closes #471). Documented
+  that translations (and their effect on a later morph's starting position) persist across
+  subsequent actions on the same object unless explicitly reversed (JuliaAnimators/Javis.jl#369).
+- Fixed `follow_path` for objects with a non-origin `start_pos`, which previously drifted
+  off the intended path (closes #491).
+- Fixed the `Luxor` module leaking into any caller's scope via `using Javis`, caused by a
+  blind re-export loop that also picked up every module's implicit self-binding
+  (closes #489). That same fix surfaced a second bug it had been masking: `@scale_layer`
+  relied on `Luxor` being in scope at the macro *call site*, not just Javis's own scope.
+- Fixed mp4 rendering silently keeping only the first frame: `render` wrote an `IOBuffer`'s
+  over-allocated backing array (`io.data`) to ffmpeg's stdin instead of just the bytes
+  written for that frame, appending garbage after each frame's PNG.
+- Fixed calls to Luxor internals renamed with a leading underscore in Luxor 3.x
+  (`get_current_redvalue` etc.), which broke every draw call needing the current color
+  (fill/stroke overrides, morphing, partial drawing, postprocessing, ...).
+- Fixed a `ProgressMeter` deprecation warning on every `render()` call (from the old
+  positional `@showprogress` syntax) that was failing any `@test_logs (:warn,)`-style test.
+- Fixed an `UndefVarError` in keyframed morphs caused by a `frame`/`rel_frame` typo.
+- Fixed `cancel_stream()` crashing instead of being a no-op when the streaming process it
+  found already exited by the time it tried to kill it (a `ps`/`grep` race, observed on
+  macOS CI).
+- Bumped `Hungarian` and `Images` compat to their latest releases (0.7 and 0.26
+  respectively); everything else's existing bound already covered the newest version.
+- Fixed 2 flaky `@test_reference` image comparisons that were failing on sub-pixel
+  anti-aliasing drift rather than an actual rendering bug (one used exact `==` instead of
+  the tolerant `psnr_equality()` every sibling test uses; the other's reference PNGs were
+  regenerated against the current, verified-correct rendering pipeline).
+- Fixed the project's CI: a hard-failing `actions/cache@v1` was taking down the entire test
+  matrix, the Documentation job couldn't deploy to GitHub Pages from a fork (custom
+  secrets aren't passed to fork workflows regardless of trigger - switched to the default
+  `GITHUB_TOKEN` with `contents: write` instead of an SSH deploy key), macOS jobs broke
+  after bumping `setup-julia` to v3 (its arch validation rejects hardcoded `x64` on Apple
+  Silicon runners - switched to `arch: default`), and `format-check` was reformatting
+  already-compliant files because it floated to JuliaFormatter's newest major version
+  (pinned to the 1.x line the codebase is actually formatted for).
 - **Breaking:** migrated to Luxor 4.x, dropping Luxor 3.x support (`Luxor = "4"`).
   - `sethue()` (the zero-argument Action-animator helper, e.g.
     `Action(1:150, color_anim, sethue())`) is renamed to **`sethue_anim()`**. Luxor 4.0
