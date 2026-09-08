@@ -26,6 +26,12 @@ act!(obj, Action(1:50, anim_translate(10, 10)))
 - `anim_translate(tp::Point)` define direction and length of the translation vector by using `Point`
 - `anim_translate(fp::Union{Object,Point}, tp::Union{Object,Point})` define the from and to point of a translation. It will be translated by `tp - fp`.
     - `Object` can be used to move to the position of another object
+
+!!! note
+    Like any translation, this persists for later [`Action`](@ref)s on the same object
+    (including a later [`morph_to`](@ref)) until something translates it back. There's no
+    automatic "snap back to where it started" - if you translate an object and then morph
+    it, the morph happens at the translated position, not at the object's original one.
 """
 anim_translate(x::Real, y::Real) = anim_translate(Point(x, y))
 anim_translate(tp::Point) = Translation(O, tp)
