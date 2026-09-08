@@ -76,6 +76,9 @@ act!(obj, Action(1:50, anim_rotate_around(2π, O)))
 - `anim_rotate_around(ta::Real, p)` define the end angle of the rotation + the rotation center.
 - `anim_rotate_around(fa::Real, ta::Real, p)` define the from and end angle + the rotation center.
 
+`p` is the rotation center in **absolute/canvas coordinates** (the same coordinates you'd use
+to place an object), not relative to the object's own `start_pos`. `O` always means the
+canvas origin here, even if the rotating object itself starts somewhere else.
 """
 anim_rotate_around(ta::Real, p) = Rotation(0.0, ta, p)
 anim_rotate_around(fa::Real, ta::Real, p) = Rotation(fa, ta, p)

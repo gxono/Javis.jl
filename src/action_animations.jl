@@ -247,7 +247,10 @@ with Animations.jl around a point `p`. For [`rotate`](@ref) it rotates around th
 An example can be seen in [`rotate`](@ref).
 
 # Arguments
-- `p`: the point to rotate around
+- `p`: the point to rotate around, in the same **absolute/canvas coordinates** you'd use to
+  place an object (e.g. `O` for the canvas origin) - not relative to the object's own
+  `start_pos`. Javis converts it to the object's local coordinates internally, so passing
+  `O` rotates around the canvas origin regardless of where the object itself starts.
 """
 function rotate_around(p)
     (video, object, action, rel_frame) ->
