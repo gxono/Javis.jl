@@ -4,6 +4,12 @@
 
 =#
 
+"""
+    Translation <: AbstractTransition
+
+The `from`/`to` pair backing [`anim_translate`](@ref)'s `Action`. Not meant to be
+constructed directly.
+"""
 struct Translation <: AbstractTransition
     from::Union{Object,Point}
     to::Union{Object,Point}
@@ -37,6 +43,13 @@ anim_translate(x::Real, y::Real) = anim_translate(Point(x, y))
 anim_translate(tp::Point) = Translation(O, tp)
 anim_translate(fp::Union{Object,Point}, tp::Union{Object,Point}) = Translation(fp, tp)
 
+"""
+    Rotation{T<:Real} <: AbstractTransition
+
+The from-angle/to-angle/center backing [`anim_rotate`](@ref) and
+[`anim_rotate_around`](@ref)'s `Action` (`center === nothing` for a plain spin in place).
+Not meant to be constructed directly.
+"""
 struct Rotation{T<:Real} <: AbstractTransition
     from::T
     to::T
@@ -89,6 +102,13 @@ canvas origin here, even if the rotating object itself starts somewhere else.
 anim_rotate_around(ta::Real, p) = Rotation(0.0, ta, p)
 anim_rotate_around(fa::Real, ta::Real, p) = Rotation(fa, ta, p)
 
+"""
+    Scaling <: AbstractTransition
+
+The from/to scale factors backing [`anim_scale`](@ref)'s `Action`. Real/`Tuple` arguments are
+normalized to a [`Scale`](@ref) by the outer constructors below. Not meant to be
+constructed directly.
+"""
 struct Scaling <: AbstractTransition
     from::Union{Object,Scale,Symbol}
     to::Union{Object,Scale,Symbol}

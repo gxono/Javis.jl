@@ -15,10 +15,38 @@ using Random
 using Statistics
 using FileIO
 
+"""
+    FRAMES_SYMBOL
+
+The symbols accepted wherever a frame range is expected in place of a `UnitRange`: `:same`
+(reuse the previous frames) and `:all` (every frame the whole video has, see
+[`global_end`](@ref)). Used to generate the error message when an unrecognized symbol is
+passed.
+"""
 const FRAMES_SYMBOL = [:same, :all]
 
+"""
+    AbstractAction
+
+Supertype of [`Action`](@ref); exists so other types (like `Layer`) can hold either kind of
+action-like thing without depending on `Action` directly.
+"""
 abstract type AbstractAction end
+
+"""
+    AbstractObject
+
+Supertype of [`Object`](@ref) and `Layer`, so a [`Video`](@ref) can hold a mix of both in
+one `Vector{AbstractObject}`.
+"""
 abstract type AbstractObject end
+
+"""
+    AbstractTransition
+
+Supertype of the transition types (e.g. `Translation`, `Rotation`, `Scaling`) returned by
+[`anim_translate`](@ref), [`anim_rotate_around`](@ref), and similar `anim_*` functions.
+"""
 abstract type AbstractTransition end
 
 include("structs/Video.jl")
@@ -28,8 +56,14 @@ include("structs/GFrames.jl")
 include("structs/Frames.jl")
 include("structs/Scale.jl")
 
+"""
+    JavisLuxorDispatcher <: Luxor.LDispatcher
+
+Marker type [`render`](@ref) installs as `Luxor.DISPATCHER[1]` for the duration of
+rendering, so the animated overrides in `luxor_overrides.jl` (`Luxor.setline`,
+`Luxor.setopacity`, etc.) get dispatched to instead of Luxor's plain versions.
+"""
 struct JavisLuxorDispatcher <: Luxor.LDispatcher end
-#Luxor.DISPATCHER[1] is assigned  and instance of this struct in `render` 
 
 """
     Transformation
@@ -199,6 +233,13 @@ function flatten(layers::Vector{AbstractObject})
     return objects
 end
 
+"""
+    flatten!(objects::Array{AbstractObject}, l::Layer)
+    flatten!(objects::Array{AbstractObject}, object::Object)
+
+Recursive step behind [`flatten`](@ref): appends `object` directly, or recurses into a
+[`Layer`](@ref)'s own objects (which may themselves be layers).
+"""
 function flatten!(objects::Array{AbstractObject}, l::Layer)
     for obj in l.layer_objects
         flatten!(objects, obj)
@@ -207,6 +248,13 @@ end
 # finally objects
 flatten!(objects::Array{AbstractObject}, object::Object) = push!(objects, object)
 
+"""
+    CURRENTLY_RENDERING
+
+Whether [`render`](@ref) is actively running, as a 1-element array. The Luxor overrides in
+`luxor_overrides.jl` (e.g. animated `setline`/`setopacity`) check this to fall back to
+plain Luxor behavior when called outside a render, such as interactively at the REPL.
+"""
 const CURRENTLY_RENDERING = [false]
 
 """
@@ -704,6 +752,16 @@ function set_object_defaults!(object)
     scaleto(desired_scale)
 end
 
+"""
+    LUXOR_DONT_EXPORT
+
+Names excluded from the blind `for func in names(Luxor; imported = true)` re-export loop
+below, because Javis defines its own animated version of the same name (e.g. `setline`,
+`setopacity`, `scale`) or because re-exporting them would be actively wrong (see the
+`:latex*` entries below). Whole *modules* visible in Luxor's namespace (Luxor itself via its
+self-binding, or one of its dependencies like `PrecompileTools`) don't need an entry here:
+the loop below skips those structurally, not by name.
+"""
 const LUXOR_DONT_EXPORT = [
     :boundingbox,
     :Boxmaptile,
@@ -715,8 +773,6 @@ const LUXOR_DONT_EXPORT = [
     :scale,
     :text,
     :background,
-    :Luxor, # every module has a self-binding to its own name; without this,
-    # `using Javis` leaks the whole Luxor module into the caller's scope (#489)
     :latexboundingbox,
     :latextextsize,
     :rawlatexboundingbox, # exported by Luxor's
@@ -725,9 +781,12 @@ const LUXOR_DONT_EXPORT = [
     # UndefVarError if called anyway.
 ]
 
-# Export each function from Luxor
+# Export each function from Luxor, skipping whole modules (Luxor's own self-binding, or one
+# of its dependencies visible via `imported = true`, e.g. PrecompileTools) - re-exporting
+# those would leak them into every `using Javis` caller's scope (#489).
 for func in names(Luxor; imported = true)
-    if !(func in LUXOR_DONT_EXPORT)
+    if !(func in LUXOR_DONT_EXPORT) &&
+       !(isdefined(Luxor, func) && getfield(Luxor, func) isa Module)
         eval(Meta.parse("import Luxor." * string(func)))
         eval(Expr(:export, func))
     end

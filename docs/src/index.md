@@ -14,10 +14,13 @@ For releases, we follow the semantic versioning protocol and enforce the [BlueSt
 
 ## Installing `Javis.jl`
 
-To install `Javis` into your Julia installation, type into your Julia REPL the following:
+This is a maintained fork ([gxono/Javis.jl](https://github.com/gxono/Javis.jl)) of the
+original, unmaintained [JuliaAnimators/Javis.jl](https://github.com/JuliaAnimators/Javis.jl)
+and isn't registered in the General registry, so `] add Javis` would install the original
+instead. Install this fork directly from GitHub:
 
 ```
-julia> ] add Javis
+julia> ] add https://github.com/gxono/Javis.jl
 ```
 
 That's all there is to it! 😃
@@ -33,9 +36,7 @@ npm install -g mathjax-node-cli
 As of this moment, we do not have native `LaTeX` rendering in Julia.
 We look forward to the day when we can remove this from our documentation!
 
-What is also required is the great package, [`LaTeXStrings`](https://github.com/stevengj/LaTeXStrings.jl).
-Add that via your Julia REPL with the following commands:
-
-```
-julia> ] add LaTeXStrings
-```
+To use the `L"..."` string macro in your own animation script, add
+`using LaTeXStrings` alongside `using Javis`.
+[`LaTeXStrings`](https://github.com/stevengj/LaTeXStrings.jl) is already one of Javis's own
+dependencies, so it's installed automatically with Javis - no separate `] add` needed.

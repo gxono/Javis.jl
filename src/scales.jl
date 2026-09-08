@@ -1,3 +1,9 @@
+"""
+    LinearScale{T}
+
+The callable mapping returned by [`scale_linear`](@ref); call it like a function
+(`mapping(x)`) to map a value or `Point` from the `fmin`-`fmax` range to `tmin`-`tmax`.
+"""
 struct LinearScale{T}
     fmin::T
     fmax::T

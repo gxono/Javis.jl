@@ -83,6 +83,14 @@ function latex(
     return animate_latex(text, pos, t, valign, halign, draw_object)
 end
 
+"""
+    animate_latex(text, pos::Point, t, valign::Symbol, halign::Symbol, object)
+
+The actual drawing behind [`latex`](@ref): places `text`'s rendered SVG at `pos` (aligned
+per `valign`/`halign`) and either draws it fully (`t >= 1`) or reveals it progressively by
+clipping to a circle of radius `t * diagonal` growing from the text's origin - this is what
+lets `latex(...)` be driven by an [`Action`](@ref)'s `t` like any other draw call.
+"""
 function animate_latex(text, pos::Point, t, valign::Symbol, halign::Symbol, object)
     svg = get_latex_svg(text)
     object == :stroke && (object = :fill)
@@ -140,6 +148,13 @@ function strip_eq(text::LaTeXString)
 end
 
 # \todo update LaTeXSVG cache to use output of strip_eq as the key. See https://github.com/JuliaAnimators/Javis.jl/pull/307#issuecomment-749616375
+"""
+    get_latex_svg(text::LaTeXString)
+
+The SVG markup for `text`, from the [`LaTeXSVG`](@ref) cache if already rendered, otherwise
+by shelling out to `tex2svg` (from `npm install -g mathjax-node-cli`) and caching the
+result. Throws if `tex2svg` isn't installed.
+"""
 function get_latex_svg(text::LaTeXString)
     # check if it's cached
     if haskey(LaTeXSVG, text)

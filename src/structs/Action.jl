@@ -24,7 +24,20 @@ mutable struct Action <: AbstractAction
     defs::Dict{Symbol,Any}
 end
 
+"""
+    CURRENT_ACTION
+
+Holds the [`Action`](@ref) currently being processed, as a 1-element array (so it can be
+mutated in place). Empty outside of rendering.
+"""
 const CURRENT_ACTION = Array{Action,1}()
+
+"""
+    PREVIOUS_ACTION
+
+Holds the previously processed [`Action`](@ref) of the current object, as a 1-element
+array. Backs [`prev_start`](@ref)/[`prev_end`](@ref) when called from inside an action.
+"""
 const PREVIOUS_ACTION = Array{Action,1}()
 
 """

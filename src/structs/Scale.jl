@@ -1,3 +1,9 @@
+"""
+    Scale
+
+An independent x/y scale factor, e.g. as used by [`Scaling`](@ref)/`anim_scale`. Supports
+elementwise `+`, `-`, `*`, and `/` with another `Scale`, and `*` with a plain number.
+"""
 struct Scale
     x::Float64
     y::Float64

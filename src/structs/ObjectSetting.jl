@@ -56,6 +56,13 @@ function update_ObjectSetting!(as::ObjectSetting, by::ObjectSetting)
     as.mul_scale = by.mul_scale
 end
 
+"""
+    update_background_settings!(setting::ObjectSetting, object::AbstractObject)
+
+If `object` was created with `in_global_layer = true` (e.g. a `Background` meant to show
+through every [`Layer`](@ref)), copy its current line width/opacity/scale/etc into
+`setting` so later objects inherit them. A no-op otherwise.
+"""
 function update_background_settings!(setting::ObjectSetting, object::AbstractObject)
     in_global_layer = get(object.opts, :in_global_layer, false)
     if in_global_layer
@@ -63,6 +70,13 @@ function update_background_settings!(setting::ObjectSetting, object::AbstractObj
     end
 end
 
+"""
+    update_object_settings!(object::AbstractObject, setting::ObjectSetting)
+
+Copy `setting`'s line width/opacity/scale/etc onto `object`'s own current settings, e.g. to
+apply a global-layer background's settings (see [`update_background_settings!`](@ref)) to
+the object about to be drawn.
+"""
 function update_object_settings!(object::AbstractObject, setting::ObjectSetting)
     update_ObjectSetting!(object.current_setting, setting)
 end

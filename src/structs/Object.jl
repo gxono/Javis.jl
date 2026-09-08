@@ -35,7 +35,22 @@ The current object can be accessed using CURRENT_OBJECT[1]
 """
 const CURRENT_OBJECT = Array{Object,1}()
 
+"""
+    PREVIOUS_OBJECT
+
+Holds the previously processed [`Object`](@ref), as a 1-element array. Backs
+[`prev_start`](@ref)/[`prev_end`](@ref) when called from inside an object (as opposed to an
+action, where [`PREVIOUS_ACTION`](@ref) is used instead).
+"""
 const PREVIOUS_OBJECT = Array{Object,1}()
+
+"""
+    CURRENT_OBJECT_ACTION_TYPE
+
+Either `:Object` or `:Action`, tracking whether frame computation is currently processing
+an object or one of its actions - lets [`prev_start`](@ref)/[`prev_end`](@ref) pick between
+[`PREVIOUS_OBJECT`](@ref) and [`PREVIOUS_ACTION`](@ref).
+"""
 const CURRENT_OBJECT_ACTION_TYPE = Array{Symbol,1}()
 
 Object(func::Function, args...; kwargs...) = Object(:same, func, args...; kwargs...)

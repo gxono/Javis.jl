@@ -112,10 +112,22 @@ function interpolation_to_transition_val(t, trans::Scaling)
     return from + t * (to - from)
 end
 
+"""
+    isapprox_discrete(val; atol = 1e-4)
+
+Whether `val` is within `atol` of the nearest integer. Used by [`follow_path`](@ref) to
+detect when an interpolated `t` has landed on (rather than between) a discrete keyframe.
+"""
 function isapprox_discrete(val; atol = 1e-4)
     return isapprox(val, round(val); atol = atol)
 end
 
+"""
+    polywh(polygon::Vector{Vector{Point}})
+
+The `(width, height)` of the bounding box around every point in every sub-polygon of
+`polygon`, i.e. `(max_x - min_x, max_y - min_y)`.
+"""
 function polywh(polygon::Vector{Vector{Point}})
     T = typeof(polygon[1][1].x)
     min_x = typemax(T)
@@ -133,6 +145,14 @@ function polywh(polygon::Vector{Vector{Point}})
     return max_x - min_x, max_y - min_y
 end
 
+"""
+    get_polypoint_at(points, t; pdist = polydistances(points))
+
+The point at arc-length fraction `t` (`0.0` to `1.0`) along the polyline `points`,
+interpolating between whichever two consecutive points straddle that distance. `pdist` is
+the polyline's cumulative distances (Luxor's `polydistances`); pass it in to avoid
+recomputing it every call, as [`follow_path`](@ref) does.
+"""
 function get_polypoint_at(points, t; pdist = polydistances(points))
     if t ≈ 0
         return points[1]

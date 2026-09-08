@@ -1,5 +1,10 @@
 # Contributing to Javis
 
+> This is a maintained fork ([gxono/Javis.jl](https://github.com/gxono/Javis.jl)) of the
+> original, now-unmaintained [JuliaAnimators/Javis.jl](https://github.com/JuliaAnimators/Javis.jl).
+> The workflow below is unchanged, but "fork", "main project", and pull requests all refer
+> to this repository, not the original.
+
 Javis is currently under heavy development as we push to a primary release version. As such, some parts of these instructions may become outdated faster than we can update them. If you encounter an error in these instructions, please open an issue and let us know. 
 
 We follow a workflow pattern that is directly inspired by the [development workflow guide](http://docs.juliaplots.org/latest/contributing/#Development-Workflow-1) found in [`Plots.jl`](https://github.com/JuliaPlots/Plots.jl). The general workflow we expect contributors to adhere to is as follows:

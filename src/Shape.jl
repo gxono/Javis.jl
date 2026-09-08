@@ -1,3 +1,11 @@
+"""
+    Shape
+
+A single closed polygon (`points`) with any holes it has (`subpaths`), plus precomputed
+info used for morphing: a simplified point list, the centroid-centered points, and angle
+counts. Used internally by [`morph_to`](@ref) to match up and interpolate between the
+shapes making up two drawings.
+"""
 struct Shape
     points::Vector{Point}
     simplified_points::Vector{Point}
@@ -9,6 +17,12 @@ struct Shape
     num_right_angles::Int
 end
 
+"""
+    EmptyShape()
+
+A [`Shape`](@ref) with no points, used as a placeholder when [`reorder_match`](@ref) pads
+one side of a morph so both sides have the same number of shapes to interpolate between.
+"""
 function EmptyShape()
     return Shape(Point[], Point[], O, Point[], Vector{Vector{Point}}(), 0, 0, 0)
 end
@@ -42,6 +56,14 @@ function Base.isempty(shape::Shape)
 end
 
 
+"""
+    get_angles(p)
+
+For a closed path `p`, drop near-straight vertices (interior angle close to 180°) and
+classify the remaining ones as acute, obtuse, or right. Returns
+`(simplified_points, num_acute, num_obtuse, num_right)`, used by [`Shape`](@ref) to build
+the angle counts [`get_similarity`](@ref) compares between two shapes.
+"""
 function get_angles(p)
     # TODO: let's assume it's a closed path
     num_acute_angles = 0
@@ -93,6 +115,16 @@ function get_angles(p)
     return simplified, num_acute_angles, num_obtuse_angles, num_right_angles
 end
 
+"""
+    get_similarity(shapeA::Shape, shapeB::Shape)
+
+Heuristic similarity score between two shapes (higher means more alike), combining how
+close their point counts, hole counts, and acute/obtuse/right angle counts are, plus how
+far apart their (centered, and separately their absolute) points end up after the cheapest
+point-to-point matching. Used to build the cost matrix [`reorder_match`](@ref) feeds to the
+Hungarian algorithm when morphing between multiple shapes, so each source shape gets paired
+with the destination shape it most resembles.
+"""
 function get_similarity(shapeA::Shape, shapeB::Shape)
     if isempty(shapeA) || isempty(shapeB)
         return 0.0
@@ -181,6 +213,13 @@ function get_similarity(shapeA::Shape, shapeB::Shape)
     return score
 end
 
+"""
+    create_shapes(polys)
+
+Group a flat list of polygons (as returned by tracing a path with holes) into
+[`Shape`](@ref)s: each clockwise polygon starts a new shape, and any counter-clockwise
+polygons immediately after it become that shape's holes (`subpaths`).
+"""
 function create_shapes(polys)
     shapes = Vector{Shape}()
 
@@ -212,6 +251,11 @@ function create_shapes(polys)
     return shapes
 end
 
+"""
+    print_basic(s::Shape)
+
+Print a one-line debug summary of `s`'s point/hole/angle counts.
+"""
 function print_basic(s::Shape)
     println("Shape: #Points: $(length(s.points))")
     println(
@@ -221,6 +265,15 @@ function print_basic(s::Shape)
 end
 
 
+"""
+    prepare_to_interpolate(from_shape, to_shape)
+
+Get `from_shape` and `to_shape` ready to be interpolated point-by-point: matches up the
+number of points on the outer polygon and on each corresponding hole, then rotates each of
+`from`'s point lists (via [`compute_shortest_morphing_dist`](@ref)) to start at whichever
+point minimizes total morphing distance, so the shapes don't visibly "twist" as they morph.
+Returns `(from, to)` as new [`Shape`](@ref)s built from the matched, rotated points.
+"""
 function prepare_to_interpolate(from_shape, to_shape)
     # match number of points for outer polygon
     from_outer, to_outer = match_num_points(from_shape.points, to_shape.points)
@@ -253,6 +306,14 @@ function prepare_to_interpolate(from_shape, to_shape)
     return from, to
 end
 
+"""
+    interpolate_shape!(inter_shape, from, to, t)
+
+Linearly interpolate every point of `inter_shape` (outer polygon and each hole) between the
+matching point in `from` and `to` at parameter `t` (`0.0` is `from`, `1.0` is `to`). `from`,
+`to`, and `inter_shape` must already have the same point counts, e.g. via
+[`prepare_to_interpolate`](@ref).
+"""
 function interpolate_shape!(inter_shape, from, to, t)
     # outer
     for (i, p1, p2) in zip(1:length(from.points), from.points, to.points)
@@ -270,6 +331,12 @@ function interpolate_shape!(inter_shape, from, to, t)
     end
 end
 
+"""
+    draw_shape(shape, draw_action)
+
+Trace `shape`'s outer polygon and each hole as Luxor subpaths, then apply `draw_action`
+(e.g. `:fill`, `:stroke`) to the resulting compound path.
+"""
 function draw_shape(shape, draw_action)
     newpath()
     poly(shape.points, :path; close = true)

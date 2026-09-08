@@ -171,6 +171,14 @@ function _morph_to(
     end
 end
 
+"""
+    offset_cache
+
+Memoizes [`get_offsets`](@ref) by the exact `(jpath1, jpath2)` pair, since it's called
+repeatedly for the same two paths across a morph's frames but is not cheap to recompute.
+Never evicted, so morphing many distinct path pairs grows this without bound for the life
+of the Julia session.
+"""
 const offset_cache = Dict{Tuple{JPath,JPath},Vector{Tuple{Symbol,Int64}}}()
 """
     get_offsets(jpath1,jpath2)
