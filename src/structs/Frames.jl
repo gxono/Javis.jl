@@ -154,10 +154,33 @@ startof(oa::Union{AbstractAction,AbstractObject}) = oa.frames.frames[1]
 endof(oa::Union{AbstractAction,AbstractObject}) = oa.frames.frames[end]
 
 """
+    global_end()
+
+The last frame of the whole video, i.e. how many frames it has in total (the same count
+`render` uses for the `:all` frames symbol). Requires at least one [`Background`](@ref) to
+already be defined, same as `:all`.
+
+Combined with [`@Frames`](@ref), this lets you define frame ranges as a percentage of the
+video's total length instead of a hardcoded frame count, so scaling a whole animation up or
+down (e.g. from 100 frames to 500) doesn't require rewriting every object's frame range:
+```julia
+Object(@Frames(0.25 * global_end(), stop = 0.75 * global_end()), ...)
+```
+Non-integer results are rounded to the nearest frame.
+"""
+function global_end()
+    maximum(CURRENT_VIDEO[1].background_frames)
+end
+
+_frame_round(x) = round(Int, x)
+
+"""
     @Frames(start, len)
     @Frames(start, stop=)
 
-Can be used to define frames using functions like [`prev_start`](@ref) or [`prev_end`](@ref)
+Can be used to define frames using functions like [`prev_start`](@ref), [`prev_end`](@ref) or
+[`global_end`](@ref). `start`/`stop` are rounded to the nearest frame if they don't evaluate
+to an integer already, so percentage-based expressions like `0.25 * global_end()` work.
 
 # Example
 ```julia
@@ -170,6 +193,11 @@ is the same as
 red_circ = Object(1:90, (args...)->circ("red"))
 blue_circ = Object(21:90, (args...)->circ("blue"))
 blue_circ = Object(41:90, (args...)->circ("blue"))
+```
+
+Frames as a percentage of the whole video, regardless of its total frame count:
+```julia
+blue_circ = Object(@Frames(0.25 * global_end(), stop = 0.75 * global_end()), (args...)->circ("blue"))
 ```
 """
 macro Frames(start, in_args...)
@@ -187,12 +215,20 @@ macro Frames(start, in_args...)
     stop_idx = findfirst(==(:stop), kwarg_symbols)
     if stop_idx !== nothing
         stop = kwargs[stop_idx][2]
-        return esc(quote
-            Javis.Frames(nothing, () -> ($start):($stop))
-        end)
+        return esc(
+            quote
+                Javis.Frames(
+                    nothing,
+                    () -> Javis._frame_round($start):Javis._frame_round($stop),
+                )
+            end,
+        )
     elseif isempty(kwarg_symbols)
         esc(quote
-            Javis.Frames(nothing, () -> ($start):($start + $(args[1]) - 1))
+            Javis.Frames(nothing, () -> begin
+                s = Javis._frame_round($start)
+                s:(s + $(args[1]) - 1)
+            end)
         end)
     end
 end

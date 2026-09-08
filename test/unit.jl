@@ -286,6 +286,18 @@
         @test Javis.get_frames(obj3) == 2:11
         @test Javis.get_frames(obj1.actions[1]) == 1:10
         @test Javis.get_frames(obj1.actions[2]) == 6:10
+
+
+        # @Frames + global_end(): frame ranges as a percentage of the whole video
+        demo = Video(500, 500)
+        back = Background(1:200, (args...) -> 1)
+        obj_stop =
+            Object(@Frames(0.25 * global_end(), stop = 0.75 * global_end()), (args...) -> 1)
+        obj_len = Object(@Frames(0.1 * global_end(), 30), (args...) -> 1)
+
+        Javis.preprocess_frames!(demo.objects)
+        @test Javis.get_frames(obj_stop) == 50:150
+        @test Javis.get_frames(obj_len) == 20:49
     end
 
     @testset "RFrames in first action" begin

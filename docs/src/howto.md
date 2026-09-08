@@ -81,6 +81,21 @@ Object(1:50, (args...)->circle(O, 50, :fill))
 Object(51:100, (args...)->circle(O, 20, :stroke), Point(100, 100))
 ```
 
+Finally, [`@Frames`](@ref) combined with [`global_end`](@ref) lets you define frames as a
+percentage of the whole video instead of a fixed frame count, which is handy if you want to
+be able to scale a whole animation up or down (say from 200 frames to 1000) without having
+to rework every object's frame range by hand:
+
+**Examples:**
+```julia
+Background(1:200, ground)
+# the middle half of the video, however many frames it ends up having
+Object(@Frames(0.25 * global_end(), stop = 0.75 * global_end()), (args...)->circle(O, 50, :fill))
+```
+
+Non-integer results are rounded to the nearest frame. Requires at least one `Background` to
+already be defined, same as the `:all` frames symbol.
+
 ## How can I make an object fade in from the background?
 
 Let's make the standard circle we used before appear from the background.

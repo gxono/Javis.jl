@@ -755,7 +755,7 @@ export scaleto
 export act!
 export anim_translate, anim_rotate, anim_rotate_around, anim_scale
 
-export @Frames, prev_start, prev_end, startof, endof
+export @Frames, prev_start, prev_end, startof, endof, global_end
 export JBox, JCircle, JEllipse, JLine, JPoly, JRect, JStar, @JShape
 
 # custom override of luxor extensions
